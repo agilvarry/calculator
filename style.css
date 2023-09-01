@@ -20,7 +20,8 @@ main {
     width: 200px;
 }
 
-#display {
+#screen {
+    color: white;
     flex: 0 0 auto;
     height: 80px;
     width: 160px;
@@ -31,19 +32,17 @@ main {
 #keypad {
     display: flex;
     flex-wrap: wrap;
-    justify-content: ;
     flex: 0 0 auto;
     width: 160px;
     height: 100px;
     margin: 0 20px 20px 20px;
 }
-#zero {
-    flex: 2 1 80px;
-}
 
 .key{
     flex: 1 1 40px;
     height: 30px;
-   
 }
 
+.zero {
+    flex: 2 1 80px;
+}
