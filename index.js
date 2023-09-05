@@ -5,20 +5,30 @@ const screen = document.querySelector('#screen')
 const state = {
     memory: '0',
     screen: '0',
-    operator: null
+    changeScreen: false,
+    operator: null,
+    decimal: false
+}
+const MAX_LENGTH = 15
+
+function setMemory(memory = '0') {
+    state.memory = String(memory).slice(0, MAX_LENGTH);
 }
 
-function setMemory(memory = 0) {
-    state.memory = memory;
+function setChangeScreen(change = false) {
+    state.changeScreen = change;
 }
 
-function setScreen(newScreen = 0) {
-    state.screen = newScreen;
-    screen.textContent = newScreen;
+function setScreen(newScreen = '0') {
+    state.screen = String(newScreen).slice(0, MAX_LENGTH);
+    screen.textContent = state.screen;
 }
 
 function setOperator(operator = null) {
     state.operator = operator;
+}
+function setDecimal(decimal = null) {
+    state.decimal = decimal;
 }
 
 /**
@@ -57,15 +67,12 @@ function operate(a, b, operator) {
     return operator(a, b);
 }
 
-function updateScreen(newState) {
-
-}
-
 /**
  * Event Listener functions
  */
 
 function operatorClick(event) {
+
     const operators = {
         'multiply': multiply,
         'add': add,
@@ -74,36 +81,62 @@ function operatorClick(event) {
         'divide': divide
     }
 
-    console.log(event.target.id)
-    // alert("operator!")
-    // const res = operate(state.a, state.b, operator.id);
-    // setState
+    if (state.operator !== null) {
+        operateClick()
+    }
+    const newOperator = operators[event.target.id]
+    setMemory(state.screen);
+    setOperator(newOperator);
+    setChangeScreen(true);
 }
 
-function clearClick(_event) {
+function clearClick() {
+    resetState()
+}
+
+function resetState(screen = '0', changeScreen = false) {
     setMemory()
-    setScreen()
+    setScreen(screen)
     setOperator()
+    setDecimal()
+    setChangeScreen(changeScreen)
 }
 
 function numberClick(event) {
     const key = event.target.id;
-    const screenState = state.screen;
-    /**
-     * if decimal is pressed, append to screen state
-     * else if screen is 0 set screen to just key
-     * else add key to end of screenState
-     */
-    const newScreen = key === 'decimal' ? screenState + '.' :
-        String(screenState) === "0" ? key : screenState + key;
-    console.log(screenState, newScreen)
-    console.log(typeof screen, typeof newScreen)
+    const screenState = state.changeScreen ? '0' : state.screen;
+    const newScreen = screenState === '0' ? key : screenState + key;
+    setScreen(newScreen)
+    setChangeScreen()
+}
 
+function decimalClick() {
+    if (!state.decimal) {
+        const newScreen = state.screen + '.';
+        setScreen(newScreen)
+        setDecimal(true)
+    }
+}
+
+function operateClick() {
+    if (state.operator) {
+        const newScreen = operate(Number(state.memory), Number(state.screen), state.operator)
+        resetState(newScreen, true);
+    }
+
+}
+
+function plusMinusClick() {
+    const newScreen = toggleSign(state.screen)
     setScreen(newScreen)
 }
-/*
+
+/**
 * Add Event Listeners
-**/
+*/
+document.querySelector("#plusMinus").addEventListener('click', plusMinusClick)
+document.querySelector("#operate").addEventListener('click', operateClick)
+
 document.querySelector("#clear").addEventListener('click', clearClick)
 
 document.querySelectorAll(".operator").forEach(operator => {
@@ -114,3 +147,4 @@ document.querySelectorAll(".number").forEach(operator => {
     operator.addEventListener('click', numberClick)
 })
 
+document.querySelector("#decimal").addEventListener('click', decimalClick)
